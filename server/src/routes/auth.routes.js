@@ -1,23 +1,26 @@
-import express from 'express';
-import bcrypt from 'bcrypt';
-import jwt from 'jsonwebtoken';
-import prisma from '../lib/prisma.js';
-import { authMiddleware } from '../middleware/auth.middleware.js';
+import express from "express";
+import bcrypt from "bcrypt";
+import jwt from "jsonwebtoken";
+import prisma from "../lib/prisma.js";
+import { authMiddleware } from "../middleware/auth.middleware.js";
 
 const router = express.Router();
 
 // Generate JWT token
 const generateToken = (id) => {
-  return jwt.sign({ id }, process.env.JWT_SECRET, { expiresIn: '30d' });
+  if (!process.env.JWT_SECRET) {
+    throw new Error("JWT_SECRET is not configured");
+  }
+  return jwt.sign({ id }, process.env.JWT_SECRET, { expiresIn: "30d" });
 };
 
 // Register
-router.post('/register', async (req, res) => {
+router.post("/register", async (req, res) => {
   try {
     const { username, email, password } = req.body;
 
     if (!username || !email || !password) {
-      return res.status(400).json({ message: 'Semua field harus diisi' });
+      return res.status(400).json({ message: "Semua field harus diisi" });
     }
 
     // Check if user exists
@@ -28,7 +31,9 @@ router.post('/register', async (req, res) => {
     });
 
     if (userExists) {
-      return res.status(400).json({ message: 'Email atau username sudah terdaftar' });
+      return res
+        .status(400)
+        .json({ message: "Email atau username sudah terdaftar" });
     }
 
     // Hash password
@@ -55,12 +60,15 @@ router.post('/register', async (req, res) => {
     });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ message: 'Terjadi kesalahan pada server' });
+    res.status(500).json({
+      message: "Terjadi kesalahan pada server",
+      error: error.message,
+    });
   }
 });
 
 // Login
-router.post('/login', async (req, res) => {
+router.post("/login", async (req, res) => {
   try {
     const { email, password } = req.body;
 
@@ -79,16 +87,19 @@ router.post('/login', async (req, res) => {
         token: generateToken(user.id),
       });
     } else {
-      res.status(401).json({ message: 'Email atau password salah' });
+      res.status(401).json({ message: "Email atau password salah" });
     }
   } catch (error) {
     console.error(error);
-    res.status(500).json({ message: 'Terjadi kesalahan pada server' });
+    res.status(500).json({
+      message: "Terjadi kesalahan pada server",
+      error: error.message,
+    });
   }
 });
 
 // Get Current User (Me)
-router.get('/me', authMiddleware, async (req, res) => {
+router.get("/me", authMiddleware, async (req, res) => {
   try {
     const user = await prisma.user.findUnique({
       where: { id: req.user.id },
@@ -107,7 +118,7 @@ router.get('/me', authMiddleware, async (req, res) => {
     res.json(user);
   } catch (error) {
     console.error(error);
-    res.status(500).json({ message: 'Terjadi kesalahan pada server' });
+    res.status(500).json({ message: "Terjadi kesalahan pada server" });
   }
 });
 
