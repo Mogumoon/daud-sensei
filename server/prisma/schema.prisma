@@ -1,0 +1,58 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id          String   @id @default(uuid())
+  email       String   @unique
+  username    String   @unique
+  password    String
+  avatar      String?
+  xp          Int      @default(0)
+  level       Int      @default(1)
+  streak      Int      @default(0)
+  lastActive  DateTime @default(now())
+  createdAt   DateTime @default(now())
+
+  quizResults QuizResult[]
+  badges      UserBadge[]
+  chatLogs    ChatLog[]
+}
+
+model QuizResult {
+  id         String   @id @default(uuid())
+  userId     String
+  quizType   String   // "hiragana", "vocab", "grammar", etc.
+  score      Int
+  totalQ     Int
+  xpEarned   Int
+  timeTaken  Int      // dalam detik
+  mode       String   @default("practice")
+  createdAt  DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id])
+}
+
+model ChatLog {
+  id        String   @id @default(uuid())
+  userId    String
+  role      String   // "user" | "assistant"
+  content   String
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id])
+}
+
+model UserBadge {
+  id       String @id @default(uuid())
+  userId   String
+  badgeId  String
+  earnedAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id])
+}
