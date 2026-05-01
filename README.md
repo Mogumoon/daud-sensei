@@ -276,12 +276,6 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 - UI inspiration from modern language learning apps
 - Community feedback and contributions
 
-## 📞 Support
-
-- 📧 Email: support@daudsensei.com
-- 💬 Discord: [Join our community](https://discord.gg/daudsensei)
-- 🐛 Issues: [GitHub Issues](https://github.com/Mogumoon/daud-sensei/issues)
-
 ---
 
 **頑張って！(Ganbatte! - Good luck with your Japanese learning!)** 🎌✨
